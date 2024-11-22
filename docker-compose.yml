@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - book
+      - customer
+      - order
+
+  book:
+    build:
+      context: ./books
+    ports:
+      - "4000:4000"
+
+  customer:
+    build:
+      context: ./customer
+    ports:
+      - "5000:5000"
+
+  order:
+    build:
+      context: ./orders
+    ports:
+      - "6000:6000"
+
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+
+
+
+docker-compose up --build
+
+
+
+
+//prodcut mode 
+
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      BOOK_SERVICE_URL: http://book-service:4000
+      CUSTOMER_SERVICE_URL: http://customer-service:5000
+      ORDER_SERVICE_URL: http://order-service:6000
+    depends_on:
+      - book
+      - customer
+      - order
+
+  book:
+    build:
+      context: ./books
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mongodb://mongo:27017/book_db
+
+  customer:
+    build:
+      context: ./customer
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mongodb://mongo:27017/customer_db
+
+  order:
+    build:
+      context: ./orders
+    ports:
+      - "6000:6000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mongodb://mongo:27017/order_db
+
+  mongo:
+    image: mongo:5.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+
+
+
+
+
+
+
+
+
+
+
+
+  //worked version of oen prject 
+  version: '3'
+services:
+  app:
+    container_name: docker-node-mongo
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongo  # This ensures the app waits for MongoDB to start
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - '27017:27017'
